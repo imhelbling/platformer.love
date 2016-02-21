@@ -14,7 +14,9 @@ do
     __init = function(self, x, y, width, height)
       self.x, self.y, self.width, self.height = x, y, width, height
       self.draw = function()
-        return love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+        love.graphics.setColor(0, 255, 0)
+        love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+        return love.graphics.setColor(255, 255, 255)
       end
       self.move_speed = meters(5)
       self.falling = true
@@ -33,13 +35,6 @@ do
           return self.x + self.width
         end
       end
-      self.collides = function(x2, y2, w2, h2)
-        return self.x < x2 + w2 and x2 < self.x + self.width and self.y < y2 + h2 and y2 < self.y + self.height
-      end
-      self.collide_top = false
-      self.collide_bottom = false
-      self.collide_left = false
-      self.collide_right = false
       self.fall = function(dt)
         if self.collide_bottom then
           self.y_vel = 0
@@ -57,11 +52,11 @@ do
           self:reset()
         end
         if not (self.collide_right) then
-          if love.keyboard.isDown("right") then
+          if love.keyboard.isDown("d") then
             self.x = self.x + (self.move_speed * dt)
           end
         end
-        if love.keyboard.isDown("left") then
+        if love.keyboard.isDown("a") then
           self.x = self.x - (self.move_speed * dt)
         end
       end
@@ -91,24 +86,10 @@ do
   local _base_0 = { }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, type, x, y, width, height)
-      self.type, self.x, self.y, self.width, self.height = type, x, y, width, height
+    __init = function(self, x, y, width, height)
+      self.x, self.y, self.width, self.height = x, y, width, height
       self.draw = function()
         return love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
-      end
-      self.side = function(side)
-        if side == "top" then
-          return self.y
-        end
-        if side == "bottom" then
-          return self.y + self.height
-        end
-        if side == "left" then
-          return self.x
-        end
-        if side == "right" then
-          return self.x + self.width
-        end
       end
     end,
     __base = _base_0,
@@ -125,25 +106,14 @@ do
   Box = _class_0
 end
 local player = Player(200, 10, meters(0.5), meters(1.75))
-local floor = "floor", Box(60, 500, 600, 40)
-local wall = "l wall", Box(620, 150, 40, 350)
-local wall2 = "l wall", Box(59, 501, 10, 40)
+local floor = Box(60, 500, 600, 40)
+local wall = Box(620, 150, 40, 350)
+local wall2 = Box(59, 501, 10, 40)
 love.load = function()
   return player.reset()
 end
 love.update = function(dt)
   player.control(dt)
-  if player.collides(floor.x, floor.y, floor.width, floor.height) then
-    player.y = (floor.side("top")) - player.height
-    player.collide_bottom = true
-  else
-    player.collide_bottom = false
-  end
-  if player.collides(wall.x, wall.y, wall.width, wall.height) then
-    player.collide_right = true
-  else
-    player.collide_right = false
-  end
   return player.fall(dt)
 end
 love.draw = function()

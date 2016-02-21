@@ -12,7 +12,11 @@ class Player
 	new: (@x, @y, @width, @height) =>
 
 		@draw = ->
+			love.graphics.setColor 0, 255, 0
 			love.graphics.rectangle "fill", @x, @y, @width, @height
+			
+			love.graphics.setColor 255, 255, 255
+
 
 		@move_speed = meters(5)
 
@@ -28,19 +32,6 @@ class Player
 				return @x
 			if side == "right"
 				return @x + @width
-
-		@collides = (x2,y2,w2,h2) ->
-			return @x < x2 + w2 and
-			x2 < @x + @width and
-			@y < y2 + h2 and
-			y2 < @y + @height
-
-		@collide_top = false
-		@collide_bottom = false
-		@collide_left = false
-		@collide_right = false
-
-
 
 		@fall = (dt) ->
 			if @collide_bottom
@@ -61,10 +52,10 @@ class Player
 				@reset!
 
 			unless @collide_right
-				if love.keyboard.isDown "right"
+				if love.keyboard.isDown "d"
 					@x += @move_speed * dt
 		
-			if love.keyboard.isDown "left"
+			if love.keyboard.isDown "a"
 				@x -= @move_speed * dt
 
 
@@ -77,36 +68,21 @@ class Player
 
 
 
-		
-
-
-
 class Box
-	new: (@type, @x, @y, @width, @height) =>
+	new: (@x, @y, @width, @height) =>
 
 		@draw = ->
 			love.graphics.rectangle "line", @x, @y, @width, @height
 
 
 
-		@side = (side) ->
-			if side == "top"
-				return @y
-			if side == "bottom"
-				return @y + @height
-			if side == "left"
-				return @x
-			if side == "right"
-				return @x + @width
-
-
 
 player = Player 200, 10, meters(0.5), meters(1.75)
 --player = Player 60, 10, meters(20), meters(20)
 
-floor = "floor", Box 60, 500, 600, 40
-wall = "l wall", Box 620, 150, 40, 350
-wall2 = "l wall", Box 59, 501, 10, 40
+floor = Box 60, 500, 600, 40
+wall = Box 620, 150, 40, 350
+wall2 = Box 59, 501, 10, 40
 
 
 love.load = ->
@@ -115,41 +91,6 @@ love.load = ->
 love.update = (dt) ->
 
 	player.control dt
-
-	
-	--player collide with floor
-	if player.collides floor.x, floor.y, floor.width, floor.height
-		
-		player.y = (floor.side "top") - player.height
-		player.collide_bottom = true
-		
-
-		--if player.collides floor.x, floor.y, floor.width, floor.height
-		--	player.y = (floor.hitbox "top") - player.height + 1
-
-		else
-			player.collide_bottom = false
-			
-			
-
-
-	--player collide with wall
-
-	if player.collides wall.x, wall.y, wall.width, wall.height
-		player.collide_right = true
-	else 
-		player.collide_right = false
-
-
-	--if (player.hitbox "right") > (wall.hitbox "left")
-	--	player.x = (wall.hitbox "left") - player.width
-	--	player.collide_right = true
-	--else 
-	--	player.collide_right = false
-
-	
-		
-
 
 
 	player.fall dt
